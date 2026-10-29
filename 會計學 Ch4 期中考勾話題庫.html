@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>會計學 Ch4 期末調整分錄【純手寫刷題測驗系統】</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen pb-16">
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <!-- TOP HEADER -->
+  <header class="bg-cyan-950 text-white border-b border-cyan-900 sticky top-0 z-40 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-400 to-amber-500 flex items-center justify-center text-cyan-950 shadow-md">
+          <i class="ph-bold ph-calendar-check text-2xl"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-base sm:text-lg font-black tracking-wide">會計學 Ch4 期中考勾話題庫【期末調整實戰測驗】</h1>
+            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-400 text-cyan-950">Ch4 期末調整核心</span>
+          </div>
+          <p class="text-xs text-cyan-200">
+            涵蓋：E4-4, E4-5, E4-6, E4-7, E4-8, P4-2, P4-3（預付/預收、應計項目、天數折算與手寫調整分錄）
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center space-x-2">
+        <button onclick="window.openCh4RuleModal()" class="px-3 py-1.5 rounded-lg bg-cyan-800 hover:bg-cyan-700 text-amber-300 text-xs font-bold flex items-center space-x-1 border border-cyan-600 transition">
+          <i class="ph-bold ph-scales"></i>
+          <span>調整分錄四大天王金律</span>
+        </button>
+        <button onclick="window.resetAllCh4Questions()" class="px-3 py-1.5 rounded-lg bg-rose-900/60 hover:bg-rose-800 text-rose-200 text-xs font-bold flex items-center space-x-1 border border-rose-700 transition">
+          <i class="ph-bold ph-arrow-counter-clockwise"></i>
+          <span>重置所有作答</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs for Chapter 4 -->
+    <div class="bg-cyan-900/90 px-4 border-t border-cyan-800 overflow-x-auto">
+      <div class="max-w-7xl mx-auto flex space-x-1 text-xs font-bold py-1.5">
+        <button class="nav-tab px-3 py-1.5 rounded-md text-amber-300 bg-cyan-950" data-target="tab-e44" onclick="window.switchCh4Tab('tab-e44')">E4-4 預付與預收調整</button>
+        <button class="nav-tab px-3 py-1.5 rounded-md text-cyan-200 hover:text-white" data-target="tab-e45" onclick="window.switchCh4Tab('tab-e45')">E4-5 Masa顧問調整</button>
+        <button class="nav-tab px-3 py-1.5 rounded-md text-cyan-200 hover:text-white" data-target="tab-e46" onclick="window.switchCh4Tab('tab-e46')">E4-6 雜誌與跨週薪資</button>
+        <button class="nav-tab px-3 py-1.5 rounded-md text-cyan-200 hover:text-white" data-target="tab-e47" onclick="window.switchCh4Tab('tab-e47')">E4-7 Trigo Rock綜合調整</button>
+        <button class="nav-tab px-3 py-1.5 rounded-md text-cyan-200 hover:text-white" data-target="tab-e48" onclick="window.switchCh4Tab('tab-e48')">E4-8 Davis網頁設計</button>
+        <button class="nav-tab px-3 py-1.5 rounded-md text-cyan-200 hover:text-white" data-target="tab-p42" onclick="window.switchCh4Tab('tab-p42')">P4-2 海綿寶寶調整大題</button>
+        <button class="nav-tab px-3 py-1.5 rounded-md text-cyan-200 hover:text-white" data-target="tab-p43" onclick="window.switchCh4Tab('tab-p43')">P4-3 蘇珊甜點調整大題</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 mt-6">
+
+    <!-- QUESTION WORKSPACE TEMPLATE (SHARED STRUCTURE VIA DYNAMIC CONTROLLER) -->
+    <div id="ch4-content-container" class="space-y-6">
+      <!-- Section Content Populated via JS -->
+    </div>
+
+  </main>
+
+  <!-- ADJUSTING RULES MODAL -->
+  <div id="ch4-rule-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="font-bold text-slate-900 flex items-center space-x-2">
+          <i class="ph-bold ph-scales text-cyan-600 text-xl"></i>
+          <span>Chapter 4 期末調整分錄四大類型</span>
+        </h3>
+        <button onclick="window.closeCh4RuleModal()" class="text-slate-400 hover:text-slate-600">
+          <i class="ph-bold ph-x text-lg"></i>
+        </button>
+      </div>
+
+      <div class="text-xs space-y-3 leading-relaxed text-slate-700">
+        <div class="p-3 bg-cyan-50 rounded-xl border border-cyan-200">
+          <span class="font-bold text-cyan-950 block mb-1">★ 調整分錄第一鐵律 (Golden Rule)</span>
+          <p><strong>期末調整分錄絕不會出現現金（No Cash in Adjusting Entries）！</strong><br/>調整分錄必定是「一個實帳戶（資產/負債）」搭配「一個虛帳戶（收入/費用）」。</p>
+        </div>
+
+        <div class="p-3 bg-amber-50 rounded-xl border border-amber-200">
+          <span class="font-bold text-amber-950 block mb-1">1. 遞延項目 (Deferrals / 先收付現，後實現)</span>
+          <p>• <strong>預付費用 (Prepaid Expenses) 消耗</strong>：Dr. 費用 Expense / Cr. 預付資產 Prepaid Asset</p>
+          <p>• <strong>預收收入 (Unearned Revenues) 賺得</strong>：Dr. 預收負債 Unearned Revenue / Cr. 收入 Revenue</p>
+        </div>
+
+        <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200">
+          <span class="font-bold text-emerald-950 block mb-1">2. 應計項目 (Accruals / 先實現，後收付現)</span>
+          <p>• <strong>應計費用 (Accrued Expenses / 如應付利息、應付薪資)</strong>：Dr. 費用 Expense / Cr. 應付負債 Payable</p>
+          <p>• <strong>應計收入 (Accrued Revenues / 如應收利息、應收服務款)</strong>：Dr. 應收資產 Receivable / Cr. 收入 Revenue</p>
+        </div>
+      </div>
+
+      <button onclick="window.closeCh4RuleModal()" class="w-full py-2.5 bg-slate-900 text-white font-bold rounded-xl text-xs hover:bg-slate-800 transition">
+        關閉金律卡 (Close)
+      </button>
+    </div>
+  </div>
+
+  <!-- COMPLETE JAVASCRIPT CONTROLLER -->
+  <script>
+    // Chapter 4 Available Accounts Dictionary
+    const CH4_ACCOUNTS = [
+      { en: "Cash", zh: "現金" },
+      { en: "Accounts Receivable", zh: "應收帳款" },
+      { en: "Interest Receivable", zh: "應收利息" },
+      { en: "Notes Receivable", zh: "應收票據" },
+      { en: "Office Supplies", zh: "辦公用品" },
+      { en: "Supplies", zh: "用品盤存" },
+      { en: "Prepaid Insurance", zh: "預付保險費" },
+      { en: "Prepaid Rent", zh: "預付租金" },
+      { en: "Prepaid Taxes", zh: "預付稅費" },
+      { en: "Prepaid Subscriptions", zh: "預付訂閱費" },
+      { en: "Accounts Payable", zh: "應付帳款" },
+      { en: "Interest Payable", zh: "應付利息" },
+      { en: "Salaries Payable", zh: "應付薪資" },
+      { en: "Wages Payable", zh: "應付工資" },
+      { en: "Notes Payable", zh: "應付票據" },
+      { en: "Unearned Consulting Fees", zh: "預收顧問收入" },
+      { en: "Unearned Rent Revenue", zh: "預收租金收入" },
+      { en: "Unearned Service Revenue", zh: "預收服務收入" },
+      { en: "Unearned Subscription Revenue", zh: "預收訂閱收入" },
+      { en: "Unearned Interest", zh: "預收利息" },
+      { en: "Service Revenue", zh: "服務收入" },
+      { en: "Consulting Revenue", zh: "顧問收入" },
+      { en: "Rent Revenue", zh: "租金收入" },
+      { en: "Subscription Revenue", zh: "訂閱收入" },
+      { en: "Interest Revenue", zh: "利息收入" },
+      { en: "Insurance Expense", zh: "保險費用" },
+      { en: "Property Tax Expense", zh: "財產稅費用" },
+      { en: "Rent Expense", zh: "租金費用" },
+      { en: "Salaries Expense", zh: "薪資費用" },
+      { en: "Wages Expense", zh: "工資費用" },
+      { en: "Utilities Expense", zh: "水電雜費" },
+      { en: "Supplies Expense", zh: "用品費用" },
+      { en: "Office Supplies Expense", zh: "辦公用品費用" },
+      { en: "Subscriptions Expense", zh: "訂閱雜誌費用" },
+      { en: "Interest Expense", zh: "利息費用" },
+      { en: "Programming Expense", zh: "程式外包費用" }
+    ];
+
+    function getAccountSelectOptions(selected = "") {
+      let html = `<option value="">-- 選擇科目 (Select Account) --</option>`;
+      CH4_ACCOUNTS.forEach(a => {
+        const isSel = (a.en.toLowerCase() === selected.toLowerCase()) ? "selected" : "";
+        html += `<option value="${a.en}" ${isSel}>${a.en} (${a.zh})</option>`;
+      });
+      return html;
+    }
+
+    // Toast
+    window.showToast = function(title, msg, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      let bg = "bg-slate-900 text-white border-slate-700";
+      let icon = "ph-info";
+      if (type === 'success') {
+        bg = "bg-emerald-900 text-emerald-100 border-emerald-700";
+        icon = "ph-check-circle";
+      } else if (type === 'error') {
+        bg = "bg-rose-900 text-rose-100 border-rose-700";
+        icon = "ph-warning-circle";
+      } else if (type === 'warning') {
+        bg = "bg-amber-900 text-amber-100 border-amber-700";
+        icon = "ph-warning";
+      }
+
+      toast.className = `p-3.5 rounded-xl border shadow-xl flex items-start space-x-2 text-xs pointer-events-auto transform transition-all duration-300 max-w-sm ${bg}`;
+      toast.innerHTML = `
+        <i class="ph-bold ${icon} text-lg shrink-0 mt-0.5"></i>
+        <div class="flex-1">
+          <div class="font-bold">${title}</div>
+          <div class="text-[11px] opacity-90 mt-0.5 leading-snug">${msg}</div>
+        </div>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-8px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    };
+
+    window.openCh4RuleModal = function() {
+      document.getElementById('ch4-rule-modal').classList.remove('hidden');
+    };
+    window.closeCh4RuleModal = function() {
+      document.getElementById('ch4-rule-modal').classList.add('hidden');
+    };
+
+    // ==========================================
+    // CHAPTER 4 QUESTION DATA SET
+    // ==========================================
+    const CH4_DATA = {
+      "tab-e44": {
+        code: "E4-4",
+        titleZh: "Kearl 顧問公司：預付費用與預收收入原始與期末調整分錄",
+        titleEn: "Adjusting Entries: Prepaid Expenses and Unearned Revenues",
+        descZh: "Kearl 顧問公司在發生時預付費用借記資產、預收收入貸記負債。請針對 2022/12/31 做必要的期末調整分錄。",
+        subQuestions: [
+          {
+            id: "e44-1",
+            zh: "1. 7月1日預付 3 年期保險費 $5,400（至 2025/6/30 到期）。12月31日調整過期 6 個月之保險費。",
+            en: "July 1: Paid 3-year insurance policy $5,400 ($150/mo). Adjust for 6 months expired at Dec 31.",
+            correct: [
+              { dir: "Dr", acc: "Insurance Expense", amt: 900 },
+              { dir: "Cr", acc: "Prepaid Insurance", amt: 900 }
+            ],
+            calc: "$5,400 × (6 / 36) = $900"
+          },
+          {
+            id: "e44-2",
+            zh: "2. 2月1日預付一年期財產稅 $2,400（至 2023/1/31）。12月31日調整過期 11 個月之稅費。",
+            en: "Feb 1: Paid 1-year property taxes $2,400 ($200/mo). Adjust for 11 months expired at Dec 31.",
+            correct: [
+              { dir: "Dr", acc: "Property Tax Expense", amt: 2200 },
+              { dir: "Cr", acc: "Prepaid Taxes", amt: 2200 }
+            ],
+            calc: "$2,400 × (11 / 12) = $2,200"
+          },
+          {
+            id: "e44-3",
+            zh: "3. 5月1日預付 3 年期廣告雜誌訂閱費 $360。12月31日調整過期 8 個月費用。",
+            en: "May 1: Paid $360 for 3-year subscription. Adjust for 8 months expired at Dec 31.",
+            correct: [
+              { dir: "Dr", acc: "Subscriptions Expense", amt: 80 },
+              { dir: "Cr", acc: "Prepaid Subscriptions", amt: 80 }
+            ],
+            calc: "$360 × (8 / 36) = $80"
+          },
+          {
+            id: "e44-4",
+            zh: "4. 9月15日預收 18 個月顧問費 $3,600。12月31日調整已實現 3.5 個月收入。",
+            en: "Sept 15: Received $3,600 advance for 18-month consulting ($200/mo). Adjust for 3.5 months earned at Dec 31.",
+            correct: [
+              { dir: "Dr", acc: "Unearned Consulting Fees", amt: 700 },
+              { dir: "Cr", acc: "Consulting Revenue", amt: 700 }
+            ],
+            calc: "每月 $200 × 3.5 個月 (9/15~12/31) = $700"
+          },
+          {
+            id: "e44-5",
+            zh: "5. 11月1日預收 6 個月辦公室租金 $900。12月31日調整已賺得 2 個月租金收入。",
+            en: "Nov 1: Received $900 for 6 months rent ($150/mo). Adjust for 2 months earned at Dec 31.",
+            correct: [
+              { dir: "Dr", acc: "Unearned Rent Revenue", amt: 300 },
+              { dir: "Cr", acc: "Rent Revenue", amt: 300 }
+            ],
+            calc: "$900 × (2 / 6) = $300"
+          },
+          {
+            id: "e44-6",
+            zh: "6. 11月1日貸放客戶 $80,000，並預收 2 年期利息 $14,400。12月31日調整已賺得 2 個月利息收入。",
+            en: "Nov 1: Received $14,400 advance interest for 2 years ($600/mo). Adjust for 2 months earned at Dec 31.",
+            correct: [
+              { dir: "Dr", acc: "Unearned Interest", amt: 1200 },
+              { dir: "Cr", acc: "Interest Revenue", amt: 1200 }
+            ],
+            calc: "$14,400 × (2 / 24) = $1,200"
+          }
+        ]
+      },
+      "tab-e45": {
+        code: "E4-5",
+        titleZh: "Masa 網路顧問公司：預付與預收調整分錄",
+        titleEn: "Masa Company Adjusting Entries (Prepaid & Unearned)",
+        descZh: "Masa 公司平時借記資產記錄預付費用、貸記負債記錄預收收入。請計算截至 2022/12/31 應調整的金額（四捨五入至整數）。",
+        subQuestions: [
+          {
+            id: "e45-1",
+            zh: "1. 3月15日預收 18 個月合約款 $54,000。12月31日調整已賺得 9.5 個月之收入。",
+            en: "March 15: Received $54,000 for 18-month contract ($3,000/mo). Earned 9.5 months at Dec 31.",
+            correct: [
+              { dir: "Dr", acc: "Unearned Consulting Fees", amt: 28500 },
+              { dir: "Cr", acc: "Consulting Revenue", amt: 28500 }
+            ],
+            calc: "$3,000/月 × 9.5 個月 = $28,500"
+          },
+          {
+            id: "e45-2",
+            zh: "2. 4月1日預付 2 年期期刊訂閱費 $285。12月31日調整已過期 9 個月之費用。",
+            en: "April 1: Paid $285 for 2-year subscription. Adjust for 9 months expired at Dec 31.",
+            correct: [
+              { dir: "Dr", acc: "Subscriptions Expense", amt: 107 },
+              { dir: "Cr", acc: "Prepaid Subscriptions", amt: 107 }
+            ],
+            calc: "$285 × (9 / 24) = $106.875 ➔ 四捨五入 $107"
+          },
+          {
+            id: "e45-3",
+            zh: "3. 5月1日預付一年期財產稅 $7,500。12月31日調整已過期 8 個月之稅費。",
+            en: "May 1: Paid $7,500 property taxes for 1 year. Adjust for 8 months expired at Dec 31.",
+            correct: [
+              { dir: "Dr", acc: "Property Tax Expense", amt: 5000 },
+              { dir: "Cr", acc: "Prepaid Taxes", amt: 5000 }
+            ],
+            calc: "$7,500 × (8 / 12) = $5,000"
+          },
+          {
+            id: "e45-4",
+            zh: "4. 8月1日預收 6 個月辦公室租金 $3,350。12月31日調整已實現 5 個月租金收入。",
+            en: "Aug 1: Received $3,350 for 6 months rent. Adjust for 5 months earned at Dec 31.",
+            correct: [
+              { dir: "Dr", acc: "Unearned Rent Revenue", amt: 2792 },
+              { dir: "Cr", acc: "Rent Revenue", amt: 2792 }
+            ],
+            calc: "$3,350 × (5 / 6) = $2,791.66 ➔ 四捨五入 $2,792"
+          },
+          {
+            id: "e45-5",
+            zh: "5. 9月1日預付 2 年期保險費 $30,000。12月31日調整已過期 4 個月保費。",
+            en: "Sept 1: Paid $30,000 for 2-year insurance. Adjust for 4 months expired at Dec 31.",
+            correct: [
+              { dir: "Dr", acc: "Insurance Expense", amt: 5000 },
+              { dir: "Cr", acc: "Prepaid Insurance", amt: 5000 }
+            ],
+            calc: "$30,000 × (4 / 24) = $5,000"
+          },
+          {
+            id: "e45-6",
+            zh: "6. 10月1日貸款給客戶 $175,000 並預收一年利息 $13,300。12月31日調整賺得 3 個月利息收入。",
+            en: "Oct 1: Received $13,300 interest in advance for 1 year. Adjust for 3 months earned at Dec 31.",
+            correct: [
+              { dir: "Dr", acc: "Unearned Interest", amt: 3325 },
+              { dir: "Cr", acc: "Interest Revenue", amt: 3325 }
+            ],
+            calc: "$13,300 × (3 / 12) = $3,325"
+          }
+        ]
+      },
+      "tab-e46": {
+        code: "E4-6",
+        titleZh: "Hatch 雜誌預收訂閱 & Clark 跨週薪資調整與後續支付",
+        titleEn: "Subscription Revenue & Accrued Salaries Subsequent Payment",
+        descZh: "包含高頻考點：(1) 兩年期雜誌訂閱之期末調整；(2) 跨年薪資（12/31 為星期二，積欠兩天薪資）與次年 1/3 週五支付整週薪水。",
+        subQuestions: [
+          {
+            id: "e46-1a",
+            zh: "1(a). 6月1日收到現金 $4,800 作為兩年期雜誌訂閱（使用 Unearned Subscription Revenue）。請做 6/1 原始分錄。",
+            en: "June 1: Received $4,800 cash for 2-year subscription. Record June 1 initial entry.",
+            correct: [
+              { dir: "Dr", acc: "Cash", amt: 4800 },
+              { dir: "Cr", acc: "Unearned Subscription Revenue", amt: 4800 }
+            ],
+            calc: "收到現金借 Cash，貸記負債科目"
+          },
+          {
+            id: "e46-1b",
+            zh: "1(b). 12月31日針對上述雜誌訂閱調整已賺得 7 個月（6/1~12/31）之訂閱收入。",
+            en: "Dec 31: Adjust subscription revenue earned for 7 months ($200/mo).",
+            correct: [
+              { dir: "Dr", acc: "Unearned Subscription Revenue", amt: 1400 },
+              { dir: "Cr", acc: "Subscription Revenue", amt: 1400 }
+            ],
+            calc: "$4,800 × (7 / 24) = $1,400"
+          },
+          {
+            id: "e46-2a",
+            zh: "2(a). 每週 5 天薪資共 $180,000。12月31日為星期二，積欠週一與週二共 2 天薪資未付。請做 12/31 應計調整。",
+            en: "Weekly wages = $180,000 ($36,000/day). Dec 31 is Tuesday (2 days unpaid). Record Dec 31 adjusting entry.",
+            correct: [
+              { dir: "Dr", acc: "Salaries Expense", amt: 72000 },
+              { dir: "Cr", acc: "Salaries Payable", amt: 72000 }
+            ],
+            calc: "$180,000 × (2 / 5) = $72,000"
+          },
+          {
+            id: "e46-2b",
+            zh: "2(b). 次年 1月3日（星期五）以現金發放全週薪資 $180,000。請沖銷應付薪資並認列剩餘 3 天薪資費用！",
+            en: "Jan 3 Friday: Pay $180,000 full week salaries in cash (settle 2 days payable + recognize 3 days expense).",
+            correct: [
+              { dir: "Dr", acc: "Salaries Payable", amt: 72000 },
+              { dir: "Dr", acc: "Salaries Expense", amt: 108000 },
+              { dir: "Cr", acc: "Cash", amt: 180000 }
+            ],
+            calc: "沖銷 12/31 負債 $72,000 + 新年度 3 天費用 $108,000 = 付現 $180,000"
+          }
+        ]
+      },
+      "tab-e47": {
+        code: "E4-7",
+        titleZh: "Trigo Rock 公司：借款利息、預收租金、用品消耗與應收利息調整",
+        titleEn: "Trigo Rock Inc. Year-End Adjusting Entries",
+        descZh: "請為 Trigo Rock 公司在 12月31日做必要的 4 筆調整分錄。",
+        subQuestions: [
+          {
+            id: "e47-1",
+            zh: "1. 7月1日向外借款 $225,000，年利率 8%。截至 12月31日尚未認列利息費用。請調整 6 個月應計利息。",
+            en: "July 1: Borrowed $225,000 at 8%. Adjust for 6 months accrued interest at Dec 31.",
+            correct: [
+              { dir: "Dr", acc: "Interest Expense", amt: 9000 },
+              { dir: "Cr", acc: "Interest Payable", amt: 9000 }
+            ],
+            calc: "$225,000 × 8% × (6 / 12) = $9,000"
+          },
+          {
+            id: "e47-2",
+            zh: "2. 9月1日預收 6 個月倉庫租金 $21,000 並貸記 Unearned Rent Revenue。請調整 4 個月賺得之租金收入。",
+            en: "Sept 1: Received $21,000 for 6 months rent. Adjust for 4 months earned at Dec 31.",
+            correct: [
+              { dir: "Dr", acc: "Unearned Rent Revenue", amt: 14000 },
+              { dir: "Cr", acc: "Rent Revenue", amt: 14000 }
+            ],
+            calc: "$21,000 × (4 / 6) = $14,000"
+          },
+          {
+            id: "e47-3",
+            zh: "3. 期初用品 $1,005，年內現購 $4,300 借記 Office Supplies。年底盤點僅剩 $1,320。請調整用品消耗！",
+            en: "Supplies: Beg $1,005 + Purchases $4,300 - Ending $1,320. Record supplies used adjustment.",
+            correct: [
+              { dir: "Dr", acc: "Office Supplies Expense", amt: 3985 },
+              { dir: "Cr", acc: "Office Supplies", amt: 3985 }
+            ],
+            calc: "期初 $1,005 + 買入 $4,300 - 期末盤存 $1,320 = 消耗 $3,985"
+          },
+          {
+            id: "e47-4",
+            zh: "4. 2月1日貸放給 Nopal 公司 $90,000，年利率 7%，一年後到期還本付息。請調整 11 個月應計利息收入。",
+            en: "Feb 1: Loaned $90,000 at 7% for 1 year. Adjust for 11 months accrued interest at Dec 31.",
+            correct: [
+              { dir: "Dr", acc: "Interest Receivable", amt: 5775 },
+              { dir: "Cr", acc: "Interest Revenue", amt: 5775 }
+            ],
+            calc: "$90,000 × 7% × (11 / 12) = $5,775"
+          }
+        ]
+      },
+      "tab-e48": {
+        code: "E4-8",
+        titleZh: "Davis 網頁設計公司：5 項年度營運調整分錄",
+        titleEn: "Davis Company Web Page Design Adjusting Entries",
+        descZh: "請為 Davis 公司製作 12月31日的期末調整分錄。",
+        subQuestions: [
+          {
+            id: "e48-1",
+            zh: "1. 2月1日預付一年租金 $24,000。12月31日調整過期 11 個月之租金費用。",
+            en: "Feb 1: Prepaid 1 year rent $24,000. Adjust for 11 months expired at Dec 31.",
+            correct: [
+              { dir: "Dr", acc: "Rent Expense", amt: 22000 },
+              { dir: "Cr", acc: "Prepaid Rent", amt: 22000 }
+            ],
+            calc: "$24,000 × (11 / 12) = $22,000"
+          },
+          {
+            id: "e48-2",
+            zh: "2. 3月31日向銀行借款 $50,000，年利率 15%，一年期。12月31日尚未付息，請調整 9 個月應計利息。",
+            en: "March 31: Borrowed $50,000 at 15%. Adjust for 9 months accrued interest at Dec 31.",
+            correct: [
+              { dir: "Dr", acc: "Interest Expense", amt: 5625 },
+              { dir: "Cr", acc: "Interest Payable", amt: 5625 }
+            ],
+            calc: "$50,000 × 15% × (9 / 12) = $5,625"
+          },
+          {
+            id: "e48-3",
+            zh: "3. 預收設計費 $60,000（貸記 Unearned Revenue）。12月31日會計師查明尚有 40% 未實現，代表已賺得 60%！",
+            en: "Received $60,000 advance. 40% remains unearned, meaning 60% has been earned. Adjust revenue earned.",
+            correct: [
+              { dir: "Dr", acc: "Unearned Service Revenue", amt: 36000 },
+              { dir: "Cr", acc: "Service Revenue", amt: 36000 }
+            ],
+            calc: "$60,000 × (1 - 40%) = $36,000"
+          },
+          {
+            id: "e48-4",
+            zh: "4. 年內現購用品 $1,400 及 $1,100（共 $2,500）借記 Supplies。年底查明消耗了 $1,700。請做調整分錄。",
+            en: "Purchased $2,500 supplies. Accountant determined $1,700 was used during the year.",
+            correct: [
+              { dir: "Dr", acc: "Supplies Expense", amt: 1700 },
+              { dir: "Cr", acc: "Supplies", amt: 1700 }
+            ],
+            calc: "題目直接告知已消耗 (used) $1,700，直接調整費用 $1,700！"
+          },
+          {
+            id: "e48-5",
+            zh: "5. 發現 11 月份外包工程師請款單 $800 尚未入帳，預計明年 1 月付款。請補做應計費用調整！",
+            en: "Found unrecorded bill $800 from freelance programmer to be paid next January.",
+            correct: [
+              { dir: "Dr", acc: "Programming Expense", amt: 800 },
+              { dir: "Cr", acc: "Accounts Payable", amt: 800 }
+            ],
+            calc: "費用已發生未付款 ➔ 借記外包費用，貸記應付帳款"
+          }
+        ]
+      },
+      "tab-p42": {
+        code: "P4-2",
+        titleZh: "Sponge Bob, Inc.（海綿寶寶公司）期末 6 大調整分錄大題",
+        titleEn: "Sponge Bob, Inc. Comprehensive Adjusting Entries",
+        descZh: "課本期中考必考手寫大題：請為海綿寶寶公司在 2022年12月31日 做出正確的 6 筆期末調整分錄（a ~ f）。",
+        subQuestions: [
+          {
+            id: "p42-a",
+            zh: "a. 12/26 至 12/31 積欠員工薪資 $17,840 尚未記錄與支付。",
+            en: "Salaries for Dec 26-31 $17,840 have not been recorded or paid.",
+            correct: [
+              { dir: "Dr", acc: "Salaries Expense", amt: 17840 },
+              { dir: "Cr", acc: "Salaries Payable", amt: 17840 }
+            ],
+            calc: "應計薪資費用"
+          },
+          {
+            id: "p42-b",
+            zh: "b. 借款 $190,000，年利率 11%，積欠 3 個月利息 $5,225 尚未記錄。",
+            en: "Interest of $5,225 is payable for 3 months on an 11%, $190,000 loan.",
+            correct: [
+              { dir: "Dr", acc: "Interest Expense", amt: 5225 },
+              { dir: "Cr", acc: "Interest Payable", amt: 5225 }
+            ],
+            calc: "$190,000 × 11% × (3 / 12) = $5,225"
+          },
+          {
+            id: "p42-c",
+            zh: "c. 12月1日預付 6 個月租金 $36,000 借記 Prepaid Rent。12月31日調整過期 1 個月租金。",
+            en: "Rent of $36,000 was paid for 6 months in advance on Dec 1 and debited to Prepaid Rent.",
+            correct: [
+              { dir: "Dr", acc: "Rent Expense", amt: 6000 },
+              { dir: "Cr", acc: "Prepaid Rent", amt: 6000 }
+            ],
+            calc: "$36,000 × (1 / 6) = $6,000"
+          },
+          {
+            id: "p42-d",
+            zh: "d. 收現時貸記預收租金 $76,000。年底尚有 $42,100 屬於未賺得，代表已實現 $33,900！",
+            en: "Rent of $76,000 was credited to unearned revenue. $42,100 is still unearned at year-end.",
+            correct: [
+              { dir: "Dr", acc: "Unearned Rent Revenue", amt: 33900 },
+              { dir: "Cr", acc: "Rent Revenue", amt: 33900 }
+            ],
+            calc: "$76,000 - $42,100 = $33,900"
+          },
+          {
+            id: "p42-e",
+            zh: "e. 預付保險費中，到期消耗的保費部分為 $2,400。",
+            en: "The expired portion of an insurance policy is $2,400. Prepaid Insurance was debited.",
+            correct: [
+              { dir: "Dr", acc: "Insurance Expense", amt: 2400 },
+              { dir: "Cr", acc: "Prepaid Insurance", amt: 2400 }
+            ],
+            calc: "已到期部分即為本期費用"
+          },
+          {
+            id: "p42-f",
+            zh: "f. 持有 $4,000 票據已賺得利息收入 $400，尚未收取或入帳。",
+            en: "Interest revenue of $400 from a $4,000 note has been earned but not collected.",
+            correct: [
+              { dir: "Dr", acc: "Interest Receivable", amt: 400 },
+              { dir: "Cr", acc: "Interest Revenue", amt: 400 }
+            ],
+            calc: "應計利息收入"
+          }
+        ]
+      },
+      "tab-p43": {
+        code: "P4-3",
+        titleZh: "Susan's Sweet Shop（蘇珊甜點店）期末 6 大調整分錄大題",
+        titleEn: "Susan's Sweet Shop Comprehensive Adjusting Entries",
+        descZh: "課本必考手寫大題：請為蘇珊甜點店在 2022年12月31日 做出正確的 6 筆期末調整分錄（a ~ f）。",
+        subQuestions: [
+          {
+            id: "p43-a",
+            zh: "a. 9% 借款 $320,000，9月至12月積欠 4 個月利息 $9,600 尚未記錄。",
+            en: "Interest of $9,600 is payable for Sep through Dec on a 9%, $320,000 loan.",
+            correct: [
+              { dir: "Dr", acc: "Interest Expense", amt: 9600 },
+              { dir: "Cr", acc: "Interest Payable", amt: 9600 }
+            ],
+            calc: "$320,000 × 9% × (4 / 12) = $9,600"
+          },
+          {
+            id: "p43-b",
+            zh: "b. 收現時貸記預收租金 $93,500。年底尚有 $42,250 未賺得，代表已實現 $51,250！",
+            en: "Rent of $93,500 was credited to unearned revenue. $42,250 is still unearned at year-end.",
+            correct: [
+              { dir: "Dr", acc: "Unearned Rent Revenue", amt: 51250 },
+              { dir: "Cr", acc: "Rent Revenue", amt: 51250 }
+            ],
+            calc: "$93,500 - $42,250 = $51,250"
+          },
+          {
+            id: "p43-c",
+            zh: "c. 持有 $105,000 票據已賺得利息收入 $9,450 尚未收取或入帳。",
+            en: "Interest revenue of $9,450 from a $105,000 note has been earned but not collected.",
+            correct: [
+              { dir: "Dr", acc: "Interest Receivable", amt: 9450 },
+              { dir: "Cr", acc: "Interest Revenue", amt: 9450 }
+            ],
+            calc: "應計利息收入"
+          },
+          {
+            id: "p43-d",
+            zh: "d. 預付保險費中，到期消耗的保費部分為 $4,960。",
+            en: "The expired portion of an insurance policy is $4,960. Prepaid Insurance was debited.",
+            correct: [
+              { dir: "Dr", acc: "Insurance Expense", amt: 4960 },
+              { dir: "Cr", acc: "Prepaid Insurance", amt: 4960 }
+            ],
+            calc: "已過期部分直接轉費用"
+          },
+          {
+            id: "p43-e",
+            zh: "e. 11月15日預付 6 個月租金 $30,000 借記 Prepaid Rent。12月31日調整過期 1.5 個月租金。",
+            en: "Rent of $30,000 was paid for 6 months in advance on Nov 15 ($5,000/mo). Adjust for 1.5 months expired.",
+            correct: [
+              { dir: "Dr", acc: "Rent Expense", amt: 7500 },
+              { dir: "Cr", acc: "Prepaid Rent", amt: 7500 }
+            ],
+            calc: "每月 $5,000 × 1.5 個月 (11/15~12/31) = $7,500"
+          },
+          {
+            id: "p43-f",
+            zh: "f. 12/26 至 12/31 積欠員工薪資 $15,300 尚未記錄或支付。",
+            en: "Salaries for Dec 26-31 amounted to $15,300 and have not been recorded or paid.",
+            correct: [
+              { dir: "Dr", acc: "Salaries Expense", amt: 15300 },
+              { dir: "Cr", acc: "Salaries Payable", amt: 15300 }
+            ],
+            calc: "應計薪資費用"
+          }
+        ]
+      }
+    };
+
+    let activeTabId = "tab-e44";
+    let activeSubIndex = 0;
+
+    window.switchCh4Tab = function(tabId) {
+      activeTabId = tabId;
+      activeSubIndex = 0;
+      document.querySelectorAll('.nav-tab').forEach(b => {
+        b.classList.remove('text-amber-300', 'bg-cyan-950');
+        b.classList.add('text-cyan-200');
+      });
+      const activeBtn = document.querySelector(`.nav-tab[data-target="${tabId}"]`);
+      if (activeBtn) {
+        activeBtn.classList.add('text-amber-300', 'bg-cyan-950');
+        activeBtn.classList.remove('text-cyan-200');
+      }
+      renderActiveTabContent();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    function renderActiveTabContent() {
+      const data = CH4_DATA[activeTabId];
+      const container = document.getElementById('ch4-content-container');
+      
+      let pillBtnsHtml = data.subQuestions.map((sq, i) => `
+        <button onclick="window.selectSubQuestion(${i})" class="px-3 py-1 rounded text-xs font-bold transition shrink-0 ${i === activeSubIndex ? 'bg-cyan-600 text-white shadow' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">
+          子題 ${i + 1}
+        </button>
+      `).join('');
+
+      container.innerHTML = `
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+          <div class="border-b border-slate-200 pb-4 mb-4 flex flex-col md:flex-row md:items-center justify-between gap-2">
+            <div>
+              <div class="flex items-center space-x-2">
+                <span class="px-2.5 py-0.5 bg-cyan-100 text-cyan-800 rounded font-bold text-xs">${data.code}</span>
+                <h2 class="text-lg font-black text-slate-900">${data.titleZh}</h2>
+              </div>
+              <p class="text-xs text-slate-500 mt-1 font-mono">${data.titleEn}</p>
+              <p class="text-xs text-slate-600 mt-0.5">${data.descZh}</p>
+            </div>
+            <div class="flex space-x-1.5 overflow-x-auto py-1">${pillBtnsHtml}</div>
+          </div>
+
+          <!-- Active Question Banner -->
+          <div class="p-4 bg-cyan-50/70 rounded-xl border border-cyan-100 mb-4 space-y-1.5">
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-bold text-cyan-800">題號：${data.code} - ${activeSubIndex + 1} / ${data.subQuestions.length}</span>
+              <span class="text-cyan-600 font-mono">12月31日 期末調整</span>
+            </div>
+            <div class="text-sm font-bold text-slate-900">${data.subQuestions[activeSubIndex].zh}</div>
+            <div class="text-xs text-slate-500 font-mono">${data.subQuestions[activeSubIndex].en}</div>
+          </div>
+
+          <!-- Adjusting Journal Entry Workstation -->
+          <div class="border border-slate-200 rounded-xl overflow-hidden mb-4">
+            <div class="bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 flex justify-between items-center">
+              <span class="flex items-center space-x-1.5">
+                <i class="ph-bold ph-pencil-line text-cyan-700"></i>
+                <span>期末調整分錄編輯台 (Adjusting Entry Workstation)</span>
+              </span>
+              <button onclick="window.addCh4Row()" class="px-2.5 py-1 bg-white border border-slate-300 rounded text-[11px] font-bold text-cyan-700 hover:bg-slate-50">+ 增加一行科目</button>
+            </div>
+            <table class="w-full text-xs">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold">
+                  <th class="py-2.5 px-3 text-left w-32">方向 (Dr/Cr)</th>
+                  <th class="py-2.5 px-3 text-left">會計科目 (Account Title - 中英對照)</th>
+                  <th class="py-2.5 px-3 text-right w-36">調整金額 ($)</th>
+                  <th class="py-2.5 px-3 text-center w-12">刪除</th>
+                </tr>
+              </thead>
+              <tbody id="ch4-table-body" class="divide-y divide-slate-100 font-mono"></tbody>
+            </table>
+          </div>
+
+          <div id="ch4-feedback-box" class="hidden mb-4 p-3 rounded-xl text-xs font-bold"></div>
+
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-2">
+            <div class="flex space-x-2">
+              <button onclick="window.checkCurrentCh4()" class="px-6 py-2.5 bg-cyan-700 hover:bg-cyan-800 text-white font-bold rounded-xl text-xs shadow-md shadow-cyan-200 transition">
+                檢查調整分錄 (Check Entry)
+              </button>
+              <button onclick="window.revealCurrentCh4()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition">
+                查看標準手寫分錄與計算
+              </button>
+            </div>
+            <button onclick="window.nextSubQuestion()" class="text-xs font-bold text-cyan-700 hover:text-cyan-900 flex items-center space-x-1">
+              <span>下一小題</span>
+              <i class="ph-bold ph-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      `;
+
+      initCh4Rows();
+    }
+
+    window.selectSubQuestion = function(idx) {
+      activeSubIndex = idx;
+      renderActiveTabContent();
+    };
+
+    window.nextSubQuestion = function() {
+      const len = CH4_DATA[activeTabId].subQuestions.length;
+      if (activeSubIndex < len - 1) {
+        activeSubIndex++;
+        renderActiveTabContent();
+      } else {
+        window.showToast("本題完成", "已完成本題所有子題調整分錄，可切換上方分頁繼續練習！", "info");
+      }
+    };
+
+    function initCh4Rows() {
+      const tbody = document.getElementById('ch4-table-body');
+      tbody.innerHTML = '';
+      window.addCh4Row("Dr");
+      window.addCh4Row("Cr");
+    }
+
+    window.addCh4Row = function(dir = "Dr") {
+      const tbody = document.getElementById('ch4-table-body');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="py-2 px-3">
+          <select class="ch4-dir w-full bg-slate-50 border border-slate-300 rounded p-1.5 font-bold text-xs">
+            <option value="Dr" ${dir === 'Dr' ? 'selected' : ''}>Dr. 借方</option>
+            <option value="Cr" ${dir === 'Cr' ? 'selected' : ''}>Cr. 貸方</option>
+          </select>
+        </td>
+        <td class="py-2 px-3">
+          <select class="ch4-acc w-full bg-slate-50 border border-slate-300 rounded p-1.5 text-xs font-sans">
+            ${getAccountSelectOptions()}
+          </select>
+        </td>
+        <td class="py-2 px-3 text-right">
+          <input type="number" placeholder="0" class="ch4-amt w-full text-right bg-slate-50 border border-slate-300 rounded p-1.5 text-xs font-mono font-bold" />
+        </td>
+        <td class="py-2 px-3 text-center">
+          <button onclick="this.closest('tr').remove()" class="text-slate-400 hover:text-rose-500">
+            <i class="ph-bold ph-trash"></i>
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    };
+
+    window.checkCurrentCh4 = function() {
+      const curData = CH4_DATA[activeTabId].subQuestions[activeSubIndex];
+      const rows = document.querySelectorAll('#ch4-table-body tr');
+      const userEntries = [];
+      rows.forEach(r => {
+        const dir = r.querySelector('.ch4-dir').value;
+        const acc = r.querySelector('.ch4-acc').value;
+        const amt = parseFloat(r.querySelector('.ch4-amt').value) || 0;
+        if (acc && amt > 0) userEntries.push({ dir, acc, amt });
+      });
+
+      const fb = document.getElementById('ch4-feedback-box');
+      fb.classList.remove('hidden');
+
+      if (userEntries.length < 2) {
+        fb.className = "mb-4 p-3 rounded-xl text-xs font-bold bg-amber-100 text-amber-900";
+        fb.innerText = "請完整選擇借貸科目並填寫金額！";
+        return;
+      }
+
+      let matchCount = 0;
+      if (userEntries.length === curData.correct.length) {
+        curData.correct.forEach(c => {
+          const ok = userEntries.some(u => u.dir === c.dir && u.acc.toLowerCase() === c.acc.toLowerCase() && u.amt === c.amt);
+          if (ok) matchCount++;
+        });
+      }
+
+      if (matchCount === curData.correct.length) {
+        fb.className = "mb-4 p-3 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-800";
+        fb.innerHTML = `✓ 恭喜完全正確！期末調整方向、科目與計算金額 100% 正確！`;
+        window.showToast("完全正確", "期末調整分錄完美無誤！", "success");
+      } else {
+        fb.className = "mb-4 p-3 rounded-xl text-xs font-bold bg-rose-100 text-rose-800";
+        fb.innerHTML = `✕ 調整分錄有誤。請確認月份折算比例，或點選右側按鈕查看詳細計算公式。`;
+        window.showToast("檢查答案", "月份計算或科目方向有瑕疵，請對照公式！", "warning");
+      }
+    };
+
+    window.revealCurrentCh4 = function() {
+      const curData = CH4_DATA[activeTabId].subQuestions[activeSubIndex];
+      const fb = document.getElementById('ch4-feedback-box');
+      fb.classList.remove('hidden');
+      fb.className = "mb-4 p-3 rounded-xl text-xs bg-slate-900 text-white font-mono space-y-1.5";
+      
+      let str = `<div class="font-sans font-bold text-amber-300">【標準手寫期末調整分錄】</div>`;
+      curData.correct.forEach(c => {
+        str += `<div class="${c.dir === 'Cr' ? 'pl-6 text-cyan-200' : 'text-emerald-300'}">${c.dir}. ${c.acc}  $${c.amt.toLocaleString()}</div>`;
+      });
+      str += `<div class="pt-1.5 border-t border-slate-700 text-slate-300 font-sans text-[11px]"><strong>計算公式依據：</strong> ${curData.calc}</div>`;
+      fb.innerHTML = str;
+      window.showToast("正解展開", "已顯示標準調整分錄與月份算式。", "info");
+    };
+
+    window.resetAllCh4Questions = function() {
+      if (confirm("確定要重置第四章所有分錄編輯台嗎？")) {
+        renderActiveTabContent();
+        window.showToast("已重置", "第四章分錄編輯台已恢復空白。", "info");
+      }
+    };
+
+    // Load initial
+    window.addEventListener('DOMContentLoaded', () => {
+      renderActiveTabContent();
+      window.showToast("第四章系統載入", "已載入期末調整分錄純空白刷題系統！", "info");
+    });
+  </script>
+</body>
+</html>
